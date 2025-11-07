@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:7
+    container_name: arm-mongo
+    ports:
+      - "27018:27017" # hostPort:containerPort for Compass access
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpass
+      - MONGO_INITDB_DATABASE=arm
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    container_name: arm-app
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://admin:adminpass@mongo:27017/arm?authSource=admin
+    ports:
+      - "3001:3000"
+    # If you want live-reload development, uncomment the volumes below and run a different dev Dockerfile/script
+    # volumes:
+    #   - ./src:/app/src
+    #   - ./view:/app/view
+    #   - ./tsconfig.json:/app/tsconfig.json
+
+volumes:
+  mongo_data:

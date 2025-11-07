@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+      
+      <!-- Custom marker disabled until a real .patt file is provided
+      <a-marker type="pattern" url="path/to/pattern-marker.patt">
+        <a-box position="0 0.5 0" color="red"></a-box>
+      </a-marker>
+      -->
+
+      <a-assets>
+        <a-asset-item id="hiro-model" src="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Suzanne/glTF/Suzanne.gltf"></a-asset-item>
+      </a-assets>
+
+      <!-- Hiro marker -->
+      <a-marker preset="hiro">
+        <a-entity gltf-model="#hiro-model" position="0 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"></a-entity>
+      </a-marker>
+
+      <!-- Dynamic barcode markers will be appended here by script -->
+
+      <!-- Camera -->
+      <a-entity camera></a-entity>
+    </a-scene>
+    <script>
+      // Debug: log when the Hiro marker is detected or lost
+      document.addEventListener('DOMContentLoaded', function () {
+        var hiroMarker = document.querySelector('a-marker[preset="hiro"]');
+        if (hiroMarker) {
+          hiroMarker.addEventListener('markerFound', function () {
+            console.log('Hiro marker found');
+          });
+          hiroMarker.addEventListener('markerLost', function () {
+            console.log('Hiro marker lost');
+          });
+        }
+
+        // Fetch marker mappings from the server and create barcode markers dynamically
+        fetch('/api/mappings')
+          .then(function (res) { return res.json(); })
+          .then(function (mappings) {
+            var scene = document.querySelector('a-scene');
+            if (!scene || !Array.isArray(mappings)) return;
+            mappings.forEach(function (m) {
+              // m.markerId is expected to be a number; m.modelUrl is a glTF/GLB URL
+              var marker = document.createElement('a-marker');
+              marker.setAttribute('type', 'barcode');
+              marker.setAttribute('value', String(m.markerId));
+
+              var entity = document.createElement('a-entity');
+              entity.setAttribute('gltf-model', m.modelUrl);
+              entity.setAttribute('position', '0 0 0');
+              entity.setAttribute('rotation', '0 0 0');
+              entity.setAttribute('scale', '0.5 0.5 0.5');
+
+              marker.appendChild(entity);
+              scene.appendChild(marker);
+            });
+          })
+          .catch(function (err) { console.error('Failed to load mappings', err); });
+      });
+    </script>
+  </body>
+</html>
+
+
