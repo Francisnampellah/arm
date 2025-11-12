@@ -1,33 +1,73 @@
-version: "3.9"
 services:
-  mongo:
-    image: mongo:7
-    container_name: arm-mongo
-    ports:
-      - "27018:27017" # hostPort:containerPort for Compass access
-    volumes:
-      - mongo_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  postgres:
+    image: postgres:16-alpine
+    container_name: arm-postgres
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=adminpass
-      - MONGO_INITDB_DATABASE=arm
+      - POSTGRES_USER=arm
+      - POSTGRES_PASSWORD=arm_pass
+      - POSTGRES_DB=arm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok" ]
+      test: ["CMD-SHELL", "pg_isready -U arm"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 10
+
+  omeka-db:
+    image: mariadb:11.4
+    container_name: arm-omeka-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=omeka_root
+      - MYSQL_DATABASE=omeka
+      - MYSQL_USER=omeka
+      - MYSQL_PASSWORD=omeka_pass
+    volumes:
+      - omeka_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-pomeka_root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  omeka:
+    image: erseco/alpine-omeka-s:latest
+    container_name: arm-omeka
+    depends_on:
+      omeka-db:
+        condition: service_healthy
+    environment:
+      - OMEKA_ADMIN_EMAIL=admin@example.com
+      - OMEKA_ADMIN_PASSWORD=changeme
+      - OMEKA_SITE_TITLE=AR Marker CMS
+      - DB_HOST=omeka-db
+      - DB_NAME=omeka
+      - DB_USER=omeka
+      - DB_PASSWORD=omeka_pass
+      - DB_PREFIX=omeka_
+    ports:
+      - "8080:8080"
+    volumes:
+      - omeka_files:/var/www/html/files
 
   app:
     build: .
     container_name: arm-app
     depends_on:
-      mongo:
+      postgres:
         condition: service_healthy
+      omeka:
+        condition: service_started
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - MONGODB_URI=mongodb://admin:adminpass@mongo:27017/arm?authSource=admin
+      - DATABASE_URL=postgresql://arm:arm_pass@postgres:5432/arm?schema=public
+      # Uncomment to use an external Omeka S instance instead of the bundled container:
+      # - OMEKA_S_URL=http://your-omeka-s-instance.com
+      # - OMEKA_S_API_KEY=your-api-key-here
+      - OMEKA_S_URL=http://omeka:8080
     ports:
       - "3001:3000"
     # If you want live-reload development, uncomment the volumes below and run a different dev Dockerfile/script
@@ -37,4 +77,6 @@ services:
     #   - ./tsconfig.json:/app/tsconfig.json
 
 volumes:
-  mongo_data:
+  postgres_data:
+  omeka_db_data:
+  omeka_files:

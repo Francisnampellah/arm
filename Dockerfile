@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Install dependencies first for better layer caching
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma
 RUN npm ci || npm install --silent
 
 # Copy source and build
@@ -25,6 +26,7 @@ COPY --from=base /app/package.json ./package.json
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/dist ./dist
 COPY --from=base /app/view ./view
+COPY --from=base /app/prisma ./prisma
 
 EXPOSE 3000
 CMD ["node", "dist/server.js"]

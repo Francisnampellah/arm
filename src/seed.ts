@@ -1,4 +1,4 @@
-import { MarkerMapping } from './models/MarkerMapping';
+import prisma from './lib/prisma';
 
 const defaultMappings = [
   {
@@ -22,12 +22,15 @@ export async function seedDatabase(): Promise<void> {
     return;
   }
 
-  const existingCount = await MarkerMapping.countDocuments();
+  const existingCount = await prisma.markerMapping.count();
   if (existingCount > 0) {
     return;
   }
 
-  await MarkerMapping.insertMany(defaultMappings);
+  await prisma.markerMapping.createMany({
+    data: defaultMappings,
+    skipDuplicates: true,
+  });
   // eslint-disable-next-line no-console
   console.log('Seeded default marker mappings');
 }
