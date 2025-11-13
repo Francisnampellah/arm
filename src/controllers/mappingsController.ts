@@ -1,26 +1,16 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
-import { OmekaSService } from '../services/omekaS';
+import { StrapiService } from '../services/strapi';
 
-export function buildGetMappingsController(omekaService: OmekaSService | null) {
+export function buildGetMappingsController(strapiService: StrapiService | null) {
   return async function getMappings(_req: Request, res: Response): Promise<void> {
     try {
-      let mappings;
-
-      if (omekaService) {
-        const omekaMappings = await omekaService.fetchMarkerMappings();
-        mappings = omekaMappings.filter((m) => m.active);
-      } else {
-        mappings = await prisma.markerMapping.findMany({
-          where: { active: true },
-          select: {
-            markerId: true,
-            qrCodeData: true,
-            objectName: true,
-            modelUrl: true,
-          },
-        });
+      if (!strapiService) {
+        res.status(500).json({ error: 'Strapi integration is not configured. Mappings are served from Strapi.' });
+        return;
       }
+
+      const strapiMappings = await strapiService.fetchMarkerMappings();
+      const mappings = strapiMappings.filter((m) => m.active);
 
       res.json(mappings);
     } catch (error) {

@@ -1,32 +1,23 @@
-# Use Node 20 Alpine for a small image
-FROM node:20-alpine AS base
+# Base image
+FROM node:20-alpine
 
+# Install bash and curl (if needed)
+RUN apk add --no-cache bash curl
+
+# Set working directory
 WORKDIR /app
 
-# Install dependencies first for better layer caching
-COPY package.json package-lock.json* ./
-COPY prisma ./prisma
-RUN npm ci || npm install --silent
+# Copy package files
+COPY package*.json ./
 
-# Copy source and build
-COPY tsconfig.json ./
-COPY src ./src
-COPY view ./view
+# Install dependencies
+RUN npm install
 
-# Build the TypeScript project
-RUN npm run build
+# Copy the rest of the app code
+COPY . .
 
-# Runtime image
-FROM node:20-alpine AS runtime
-ENV NODE_ENV=production
-WORKDIR /app
-
-# Copy only what is needed to run
-COPY --from=base /app/package.json ./package.json
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/dist ./dist
-COPY --from=base /app/view ./view
-COPY --from=base /app/prisma ./prisma
-
+# Expose the app port
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+
+# Start the app
+CMD ["npm", "run", "start"]

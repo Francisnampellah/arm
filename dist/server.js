@@ -35,18 +35,10 @@ app.get('/api/mappings', async (_req, res) => {
             // Fetch from Omeka S
             const omekaMappings = await omekaService.fetchMarkerMappings();
             mappings = omekaMappings.filter((m) => m.active);
-        }
-        else {
-            // Fetch from Postgres via Prisma
-            mappings = await prisma_1.default.markerMapping.findMany({
-                where: { active: true },
-                select: {
-                    markerId: true,
-                    qrCodeData: true,
-                    objectName: true,
-                    modelUrl: true,
-                },
-            });
+        } else {
+            // No external CMS configured — runtime no longer supports a local DB.
+            res.status(500).json({ error: 'No CMS configured; mappings must be served via an external CMS.' });
+            return;
         }
         res.json(mappings);
     }
@@ -61,15 +53,9 @@ async function start() {
         // eslint-disable-next-line no-console
         console.log('Using Omeka S as content source:', OMEKA_S_URL);
     }
-    else if (DATABASE_URL) {
-        await prisma_1.default.$connect();
-        await (0, seed_1.seedDatabase)();
-        // eslint-disable-next-line no-console
-        console.log('Using Postgres as content source');
-    }
     else {
         // eslint-disable-next-line no-console
-        console.warn('Neither OMEKA_S_URL nor DATABASE_URL set; API will fail to fetch mappings.');
+        console.warn('No external CMS configured; API endpoints that require a CMS will be disabled or return errors.');
     }
     app.listen(PORT, () => {
         // eslint-disable-next-line no-console

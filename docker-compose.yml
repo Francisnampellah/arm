@@ -1,11 +1,13 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: arm-postgres
     environment:
-      - POSTGRES_USER=arm
-      - POSTGRES_PASSWORD=arm_pass
-      - POSTGRES_DB=arm
+      POSTGRES_USER: arm
+      POSTGRES_PASSWORD: arm_pass
+      POSTGRES_DB: arm
     ports:
       - "5432:5432"
     volumes:
@@ -16,67 +18,73 @@ services:
       timeout: 5s
       retries: 10
 
-  omeka-db:
-    image: mariadb:11.4
-    container_name: arm-omeka-db
+  strapi-db:
+    image: postgres:16-alpine
+    container_name: arm-strapi-db
     environment:
-      - MYSQL_ROOT_PASSWORD=omeka_root
-      - MYSQL_DATABASE=omeka
-      - MYSQL_USER=omeka
-      - MYSQL_PASSWORD=omeka_pass
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi_pass
+      POSTGRES_DB: strapi
     volumes:
-      - omeka_db_data:/var/lib/mysql
+      - strapi_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-pomeka_root"]
+      test: ["CMD-SHELL", "pg_isready -U strapi"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  omeka:
-    image: erseco/alpine-omeka-s:latest
-    container_name: arm-omeka
+  strapi:
+    image: node:20-alpine
+    container_name: arm-strapi
+    platform: linux/amd64
     depends_on:
-      omeka-db:
+      strapi-db:
         condition: service_healthy
     environment:
-      - OMEKA_ADMIN_EMAIL=admin@example.com
-      - OMEKA_ADMIN_PASSWORD=changeme
-      - OMEKA_SITE_TITLE=AR Marker CMS
-      - DB_HOST=omeka-db
-      - DB_NAME=omeka
-      - DB_USER=omeka
-      - DB_PASSWORD=omeka_pass
-      - DB_PREFIX=omeka_
+      APP_NAME: AR Marker CMS
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: strapi-db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi_pass
+      DATABASE_SSL: "false"
+      JWT_SECRET: your-jwt-secret-change-this-in-production
+      ADMIN_JWT_SECRET: your-admin-jwt-secret-change-this-in-production
+      API_TOKEN_SALT: 77c928b21c730befbbc5a6651fa82c98840898527cfbe40271b68a75b4ba4b03c1610c269fd2a2477356c204a0441b7d7986fb1b52dc77aa058eca675389375ef386fb72da573329e2506c7f56aa4f9585696cbc8f01cf159ad7ea4ab336bad6a1bb465dfc38347277d835e47ab8e6a21adb91254cb02b1b520d125d23bd6c3d
+      NODE_ENV: development
+      STRAPI_DISABLE_CLOUD: "true"
     ports:
-      - "8080:8080"
+      - "1337:1337"
+    working_dir: /srv/app
     volumes:
-      - omeka_files:/var/www/html/files
+      - strapi_app_data:/srv/app
+    command: >
+      sh -c "if [ ! -f /srv/app/package.json ]; then
+                yes | npx create-strapi-app@latest /srv/app --quickstart --no-run --skip-cloud
+              fi &&
+              cd /srv/app &&
+              npm install pg &&
+              mkdir -p config &&
+              printf 'module.exports = ({ env }) => ({ connection: { client: \"postgres\", connection: { host: env(\"DATABASE_HOST\", \"strapi-db\"), port: env.int(\"DATABASE_PORT\", 5432), database: env(\"DATABASE_NAME\", \"strapi\"), user: env(\"DATABASE_USERNAME\", \"strapi\"), password: env(\"DATABASE_PASSWORD\", \"strapi_pass\"), ssl: env.bool(\"DATABASE_SSL\", false) } } });\n' > config/database.js &&
+              npm run develop"
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: arm-app
-    depends_on:
-      postgres:
-        condition: service_healthy
-      omeka:
-        condition: service_started
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DATABASE_URL=postgresql://arm:arm_pass@postgres:5432/arm?schema=public
-      # Uncomment to use an external Omeka S instance instead of the bundled container:
-      # - OMEKA_S_URL=http://your-omeka-s-instance.com
-      # - OMEKA_S_API_KEY=your-api-key-here
-      - OMEKA_S_URL=http://omeka:8080
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://arm:arm_pass@postgres:5432/arm?schema=public
+      STRAPI_URL: http://strapi:1337
+      STRAPI_CONTENT_TYPE: marker-mappings
+      STRAPI_API_TOKEN:  77c928b21c730befbbc5a6651fa82c98840898527cfbe40271b68a75b4ba4b03c1610c269fd2a2477356c204a0441b7d7986fb1b52dc77aa058eca675389375ef386fb72da573329e2506c7f56aa4f9585696cbc8f01cf159ad7ea4ab336bad6a1bb465dfc38347277d835e47ab8e6a21adb91254cb02b1b520d125d23bd6c3d
     ports:
       - "3001:3000"
-    # If you want live-reload development, uncomment the volumes below and run a different dev Dockerfile/script
-    # volumes:
-    #   - ./src:/app/src
-    #   - ./view:/app/view
-    #   - ./tsconfig.json:/app/tsconfig.json
 
 volumes:
   postgres_data:
-  omeka_db_data:
-  omeka_files:
+  strapi_db_data:
+  strapi_app_data:

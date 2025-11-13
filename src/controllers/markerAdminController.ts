@@ -1,11 +1,9 @@
-import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
-import { OmekaSService } from '../services/omekaS';
+import { StrapiService } from '../services/strapi';
 
-function ensureLocalDataSource(omekaService: OmekaSService | null, res: Response): boolean {
-  if (omekaService) {
-    res.status(400).json({ error: 'Marker management is disabled when Omeka S is configured.' });
+function ensureStrapiEnabled(strapiService: StrapiService | null, res: Response): boolean {
+  if (!strapiService) {
+    res.status(400).json({ error: 'Marker management is disabled. Configure STRAPI_URL to enable management via Strapi.' });
     return false;
   }
   return true;
@@ -20,10 +18,10 @@ function parseMarkerId(param: string, res: Response): number | null {
   return markerId;
 }
 
-export function buildMarkerAdminController(omekaService: OmekaSService | null) {
+export function buildMarkerAdminController(strapiService: StrapiService | null) {
   return {
     createMarker: async (req: Request, res: Response): Promise<void> => {
-      if (!ensureLocalDataSource(omekaService, res)) return;
+      if (!ensureStrapiEnabled(strapiService, res)) return;
 
       const { markerId, qrCodeData, objectName, modelUrl, active = true } = req.body ?? {};
 
@@ -44,20 +42,19 @@ export function buildMarkerAdminController(omekaService: OmekaSService | null) {
       }
 
       try {
-        const created = await prisma.markerMapping.create({
-          data: {
-            markerId: numericMarkerId,
-            qrCodeData,
-            objectName,
-            modelUrl,
-            active: Boolean(active),
-          },
+        const created = await strapiService!.createMarker({
+          markerId: numericMarkerId,
+          qrCodeData,
+          objectName,
+          modelUrl,
+          active: Boolean(active),
         });
         res.status(201).json(created);
-      } catch (error) {
+      } catch (error: any) {
         // eslint-disable-next-line no-console
-        console.error('Failed to create marker mapping:', error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        console.error('Failed to create marker mapping via Strapi:', error);
+        const msg = String(error?.message || error);
+        if (msg.includes('409') || msg.includes('unique') || msg.includes('exists')) {
           res.status(409).json({ error: 'markerId or qrCodeData already exists.' });
           return;
         }
@@ -66,20 +63,14 @@ export function buildMarkerAdminController(omekaService: OmekaSService | null) {
     },
 
     updateMarker: async (req: Request, res: Response): Promise<void> => {
-      if (!ensureLocalDataSource(omekaService, res)) return;
+      if (!ensureStrapiEnabled(strapiService, res)) return;
 
       const markerId = parseMarkerId(req.params.markerId, res);
       if (markerId === null) return;
 
       const { qrCodeData, objectName, modelUrl, active } = req.body ?? {};
 
-      const data: {
-        qrCodeData?: string;
-        objectName?: string;
-        modelUrl?: string;
-        active?: boolean;
-      } = {};
-
+      const data: Partial<any> = {};
       if (qrCodeData !== undefined) data.qrCodeData = qrCodeData;
       if (objectName !== undefined) data.objectName = objectName;
       if (modelUrl !== undefined) data.modelUrl = modelUrl;
@@ -91,19 +82,17 @@ export function buildMarkerAdminController(omekaService: OmekaSService | null) {
       }
 
       try {
-        const updated = await prisma.markerMapping.update({
-          where: { markerId },
-          data,
-        });
+        const updated = await strapiService!.updateMarkerByMarkerId(markerId, data);
         res.json(updated);
-      } catch (error) {
+      } catch (error: any) {
         // eslint-disable-next-line no-console
-        console.error('Failed to update marker mapping:', error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        console.error('Failed to update marker mapping via Strapi:', error);
+        const msg = String(error?.message || error);
+        if (msg === 'not_found') {
           res.status(404).json({ error: 'Marker mapping not found.' });
           return;
         }
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        if (msg.includes('409') || msg.includes('unique') || msg.includes('exists')) {
           res.status(409).json({ error: 'markerId or qrCodeData already exists.' });
           return;
         }
@@ -112,20 +101,19 @@ export function buildMarkerAdminController(omekaService: OmekaSService | null) {
     },
 
     deleteMarker: async (req: Request, res: Response): Promise<void> => {
-      if (!ensureLocalDataSource(omekaService, res)) return;
+      if (!ensureStrapiEnabled(strapiService, res)) return;
 
       const markerId = parseMarkerId(req.params.markerId, res);
       if (markerId === null) return;
 
       try {
-        await prisma.markerMapping.delete({
-          where: { markerId },
-        });
+        await strapiService!.deleteMarkerByMarkerId(markerId);
         res.status(204).send();
-      } catch (error) {
+      } catch (error: any) {
         // eslint-disable-next-line no-console
-        console.error('Failed to delete marker mapping:', error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        console.error('Failed to delete marker mapping via Strapi:', error);
+        const msg = String(error?.message || error);
+        if (msg === 'not_found') {
           res.status(404).json({ error: 'Marker mapping not found.' });
           return;
         }

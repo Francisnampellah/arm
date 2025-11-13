@@ -1,15 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+// Prisma has been removed from this project.
+// This file is left as a no-op shim to avoid import errors during transition.
 
-declare global {
-  // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
-}
-
-const prisma = global.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
-}
+const prisma = null as unknown as any;
 
 export default prisma;
 

@@ -3,6 +3,8 @@
   <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
@@ -18,7 +20,7 @@
       </a-assets>
 
       <!-- Hiro marker -->
-      <a-marker preset="hiro">
+      <a-marker type="pattern" url="path/to/pattern-marker.patt" preset="hiro">
         <a-entity gltf-model="#hiro-model" position="0 0 0" rotation="0 0 0" scale="0.4 0.4 0.4"></a-entity>
       </a-marker>
 
