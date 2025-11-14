@@ -6,56 +6,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const prisma_1 = __importDefault(require("./lib/prisma"));
-const seed_1 = require("./seed");
-const omekaS_1 = require("./services/omekaS");
+const strapi_1 = require("./services/strapi");
+const mappingsController_1 = require("./controllers/mappingsController");
+const markerAdminController_1 = require("./controllers/markerAdminController");
+// Prisma removed: all data is served and managed via Strapi
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL || '';
-const OMEKA_S_URL = process.env.OMEKA_S_URL || '';
-const OMEKA_S_API_KEY = process.env.OMEKA_S_API_KEY || '';
-// Initialize Omeka S service if URL is provided
-const omekaService = OMEKA_S_URL ? new omekaS_1.OmekaSService(OMEKA_S_URL, OMEKA_S_API_KEY || undefined) : null;
+const STRAPI_URL = (process.env.STRAPI_URL || '').trim();
+const STRAPI_API_TOKEN = (process.env.STRAPI_API_TOKEN || '').trim();
+const STRAPI_CONTENT_TYPE = (process.env.STRAPI_CONTENT_TYPE || 'markers').trim();
+// Initialize Strapi service if URL is provided
+const strapiService = STRAPI_URL ? new strapi_1.StrapiService(STRAPI_URL, STRAPI_API_TOKEN || undefined, STRAPI_CONTENT_TYPE) : null;
 // After build, __dirname points to dist; serve project root one level up
 const projectRoot = path_1.default.resolve(__dirname, '..');
 const viewDir = path_1.default.join(projectRoot, 'view');
 // Serve static files from project root and view directory
 app.use(express_1.default.static(projectRoot));
 app.use(express_1.default.static(viewDir));
+app.use(express_1.default.json());
 // Root route serves the view/index.html
 app.get('/', (_req, res) => {
     res.sendFile(path_1.default.join(viewDir, 'index.html'));
 });
 // API: list active marker mappings
-app.get('/api/mappings', async (_req, res) => {
-    try {
-        let mappings;
-        if (omekaService) {
-            // Fetch from Omeka S
-            const omekaMappings = await omekaService.fetchMarkerMappings();
-            mappings = omekaMappings.filter((m) => m.active);
-        } else {
-            // No external CMS configured — runtime no longer supports a local DB.
-            res.status(500).json({ error: 'No CMS configured; mappings must be served via an external CMS.' });
-            return;
-        }
-        res.json(mappings);
-    }
-    catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching mappings:', err);
-        res.status(500).json({ error: 'Failed to fetch mappings' });
-    }
-});
+app.get('/api/mappings', (0, mappingsController_1.buildGetMappingsController)(strapiService));
+const markerAdminController = (0, markerAdminController_1.buildMarkerAdminController)(strapiService);
+app.post('/api/admin/markers', markerAdminController.createMarker);
+app.put('/api/admin/markers/:markerId', markerAdminController.updateMarker);
+app.delete('/api/admin/markers/:markerId', markerAdminController.deleteMarker);
 async function start() {
-    if (omekaService) {
+    if (strapiService) {
         // eslint-disable-next-line no-console
-        console.log('Using Omeka S as content source:', OMEKA_S_URL);
+        console.log('Using Strapi CMS as content source:', STRAPI_URL);
     }
     else {
         // eslint-disable-next-line no-console
-        console.warn('No external CMS configured; API endpoints that require a CMS will be disabled or return errors.');
+        console.warn('STRAPI_URL not set; API endpoints that require Strapi will be disabled or return errors.');
     }
     app.listen(PORT, () => {
         // eslint-disable-next-line no-console

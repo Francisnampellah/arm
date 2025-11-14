@@ -134,7 +134,7 @@ export class StrapiService {
    */
   async fetchMarkerMappings(): Promise<MarkerMappingFromStrapi[]> {
     try {
-      const url = `${this.baseUrl}/api/${this.contentType}?publicationState=live&pagination[limit]=1000`;
+      const url = `${this.baseUrl}/api/markers?publicationState=live&pagination[limit]=1000`;
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };
@@ -169,17 +169,34 @@ export class StrapiService {
   private mapStrapiItemToMarkerMapping(
     item: StrapiDataItem<StrapiMarkerMapping>
   ): MarkerMappingFromStrapi | null {
-    const attrs = item.attributes;
+    // Strapi responses can vary depending on collection config / plugins.
+    // Typical shape: { id, attributes: { markerId, qrCodeData, ... } }
+    // But sometimes items are returned directly. Be defensive and tolerant.
+    const raw = item as any;
+    const attrs = (raw && (raw.attributes ?? raw)) as any;
 
-    const markerId = attrs.markerId;
-    const qrCodeData = attrs.qrCodeData || `marker-${markerId}`;
-    const objectName = attrs.objectName || 'Unnamed Object';
-    const modelUrl = attrs.modelUrl || '';
+    if (!attrs || typeof attrs !== 'object') {
+      // eslint-disable-next-line no-console
+      console.warn('Unexpected Strapi item shape, skipping item:', JSON.stringify(raw).slice(0, 500));
+      return null;
+    }
+
+    // Accept several common key variants to be more robust
+    const markerId = attrs.markerId ?? attrs.marker_id ?? attrs.markerIdValue ?? null;
+    const qrCodeData = attrs.qrCodeData ?? attrs.qr_code_data ?? attrs.qr ?? (markerId != null ? `marker-${markerId}` : undefined);
+    const objectName = attrs.objectName ?? attrs.object_name ?? attrs.name ?? 'Unnamed Object';
+    const modelUrl = attrs.modelUrl ?? attrs.model_url ?? attrs.url ?? '';
     const active = attrs.active !== undefined ? attrs.active : true;
 
-    // Only skip if markerId is missing or modelUrl is empty
-    if (markerId === undefined || markerId === null || !modelUrl) {
+    // Only skip if markerId is missing. If modelUrl is missing, include the
+    // item but warn so incomplete entries can be fixed in Strapi.
+    if (markerId === undefined || markerId === null) {
       return null;
+    }
+
+    if (!modelUrl) {
+      // eslint-disable-next-line no-console
+      console.warn('Strapi item missing modelUrl for markerId:', markerId);
     }
 
     return {

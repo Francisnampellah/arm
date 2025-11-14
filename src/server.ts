@@ -10,9 +10,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL || '';
-const STRAPI_URL = process.env.STRAPI_URL || '';
-const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '77c928b21c730befbbc5a6651fa82c98840898527cfbe40271b68a75b4ba4b03c1610c269fd2a2477356c204a0441b7d7986fb1b52dc77aa058eca675389375ef386fb72da573329e2506c7f56aa4f9585696cbc8f01cf159ad7ea4ab336bad6a1bb465dfc38347277d835e47ab8e6a21adb91254cb02b1b520d125d23bd6c3d';
-const STRAPI_CONTENT_TYPE = process.env.STRAPI_CONTENT_TYPE || 'marker-mappings';
+const STRAPI_URL = (process.env.STRAPI_URL || '').trim();
+const STRAPI_API_TOKEN = (process.env.STRAPI_API_TOKEN || '').trim();
+const STRAPI_CONTENT_TYPE = (process.env.STRAPI_CONTENT_TYPE || 'markers').trim();
 
 // Initialize Strapi service if URL is provided
 const strapiService = STRAPI_URL ? new StrapiService(STRAPI_URL, STRAPI_API_TOKEN || undefined, STRAPI_CONTENT_TYPE) : null;

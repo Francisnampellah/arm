@@ -15,6 +15,7 @@ export function buildGetMappingsController(strapiService: StrapiService | null) 
       res.json(mappings);
     } catch (error) {
       // eslint-disable-next-line no-console
+      console.log('Strapi fetch error:', error);
       console.error('Error fetching mappings:', error);
       res.status(500).json({ error: 'Failed to fetch mappings' });
     }
