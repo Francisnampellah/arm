@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const strapi_1 = require("./services/strapi");
@@ -25,6 +26,23 @@ const viewDir = path_1.default.join(projectRoot, 'view');
 // Serve static files from project root and view directory
 app.use(express_1.default.static(projectRoot));
 app.use(express_1.default.static(viewDir));
+// Serve markers assets from persistent volume if present, otherwise fall back to repo
+const markersVolumePath = '/data/markers';
+const markersFallback = path_1.default.join(projectRoot, 'markers');
+if (fs_1.default.existsSync(markersVolumePath)) {
+    // eslint-disable-next-line no-console
+    console.log('Serving markers from volume at', markersVolumePath);
+    app.use('/markers', express_1.default.static(markersVolumePath));
+}
+else if (fs_1.default.existsSync(markersFallback)) {
+    // eslint-disable-next-line no-console
+    console.log('Serving markers from repo at', markersFallback);
+    app.use('/markers', express_1.default.static(markersFallback));
+}
+else {
+    // eslint-disable-next-line no-console
+    console.warn('No markers directory found at', markersVolumePath, 'or', markersFallback);
+}
 app.use(express_1.default.json());
 // Root route serves the view/index.html
 app.get('/', (_req, res) => {

@@ -49,6 +49,7 @@ services:
       DATABASE_USERNAME: strapi
       DATABASE_PASSWORD: strapi_pass
       DATABASE_SSL: "false"
+      HOST: "0.0.0.0"
       JWT_SECRET: your-jwt-secret-change-this-in-production
       ADMIN_JWT_SECRET: your-admin-jwt-secret-change-this-in-production
       API_TOKEN_SALT: c00683ad71f26871fa7a08cfa4e4755ff8b909f005b25cd48caa7deda11d60b4a604fc871239016bd87050b67360db34afd55749724c58eea9082696932ec80ae61a062cd72bfae9e56e4a61309a0d8d78f2e65bfd3c2b8bf91ce9e1c115f828193151f24c515684bb6b57ed9213930318ba0ac358faf41e2cc16a86eff05549
@@ -59,6 +60,11 @@ services:
     working_dir: /srv/app
     volumes:
       - strapi_app_data:/srv/app
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:1337/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
     command: >
       sh -c "if [ ! -f /srv/app/package.json ]; then
                 yes | npx create-strapi-app@latest /srv/app --quickstart --no-run --skip-cloud
@@ -74,6 +80,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: arm-app
+    depends_on:
+      strapi:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
