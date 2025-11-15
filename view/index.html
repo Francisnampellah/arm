@@ -10,17 +10,19 @@
     <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
       
       <!-- Custom marker disabled until a real .patt file is provided
-      <a-marker type="pattern" url="path/to/pattern-marker.patt">
+      -->
+      <!-- Example pattern marker using the bundled patterns directory -->
+      <a-marker type="pattern" url="/markers/patterns/pattern-00.patt">
         <a-box position="0 0.5 0" color="red"></a-box>
       </a-marker>
-      -->
+      
 
       <a-assets>
         <a-asset-item id="hiro-model" src="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Lantern/glTF/Lantern.gltf"></a-asset-item>
       </a-assets>
 
       <!-- Hiro marker -->
-      <a-marker type="pattern" url="path/to/pattern-marker.patt" preset="hiro">
+      <a-marker type="barcode" value="1" preset="hiro">
         <a-entity gltf-model="#hiro-model" position="0 0 0" rotation="0 0 0" scale="0.4 0.4 0.4"></a-entity>
       </a-marker>
 
@@ -50,17 +52,31 @@
             if (!scene || !Array.isArray(mappings)) return;
             mappings.forEach(function (m) {
               // m.markerId is expected to be a number; m.modelUrl is a glTF/GLB URL
+              var id = Number(m.markerId);
+              if (!Number.isFinite(id) || Number.isNaN(id)) return; // skip invalid ids
+
               var marker = document.createElement('a-marker');
               marker.setAttribute('type', 'barcode');
-              marker.setAttribute('value', String(m.markerId));
+              marker.setAttribute('value', String(id));
 
-              var entity = document.createElement('a-entity');
-              entity.setAttribute('gltf-model', m.modelUrl);
-              entity.setAttribute('position', '0 0 0');
-              entity.setAttribute('rotation', '0 0 0');
-              entity.setAttribute('scale', '0.5 0.5 0.5');
+              if (m.modelUrl && typeof m.modelUrl === 'string' && m.modelUrl.trim() !== '') {
+                var entity = document.createElement('a-entity');
+                entity.setAttribute('gltf-model', m.modelUrl);
+                entity.setAttribute('position', '0 0 0');
+                entity.setAttribute('rotation', '0 0 0');
+                entity.setAttribute('scale', '0.5 0.5 0.5');
+                marker.appendChild(entity);
+              } else {
+                // Render a simple placeholder when modelUrl is missing
+                var placeholder = document.createElement('a-box');
+                placeholder.setAttribute('position', '0 0.5 0');
+                placeholder.setAttribute('color', '#4CC3D9');
+                placeholder.setAttribute('depth', '0.5');
+                placeholder.setAttribute('height', '0.5');
+                placeholder.setAttribute('width', '0.5');
+                marker.appendChild(placeholder);
+              }
 
-              marker.appendChild(entity);
               scene.appendChild(marker);
             });
           })

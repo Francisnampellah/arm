@@ -83,8 +83,11 @@ services:
       STRAPI_API_TOKEN:  bd6a8b9475c76ce6b69b9e08fad2c54c9cc8dc269a02ea624c5c8caa56eb576acf6a63abf2001659c6f69de8683eadcf54df81b3dc0b81578c6f1f99571f83b3ce67812d4f249161c1273c377f85c80902cc26814579ed98f5195595a9c6ceb4e6e92d6326f75f86aa77960a5e3e107844fb81dce7b6074d6c3902a0d4144718
     ports:
       - "3001:3000"
+    volumes:
+      - app_data:/data
 
 volumes:
   postgres_data:
   strapi_db_data:
   strapi_app_data:
+  app_data:

@@ -181,27 +181,58 @@ export class StrapiService {
       return null;
     }
 
-    // Accept several common key variants to be more robust
-    const markerId = attrs.markerId ?? attrs.marker_id ?? attrs.markerIdValue ?? null;
-    const qrCodeData = attrs.qrCodeData ?? attrs.qr_code_data ?? attrs.qr ?? (markerId != null ? `marker-${markerId}` : undefined);
-    const objectName = attrs.objectName ?? attrs.object_name ?? attrs.name ?? 'Unnamed Object';
-    const modelUrl = attrs.modelUrl ?? attrs.model_url ?? attrs.url ?? '';
+    // Accept several common key variants and top-level shapes to be robust
+    // Try a list of candidate fields that might represent the marker id
+    const candidateMarkerId =
+      // prefer explicit barcode field (your sample uses `barcode`)
+      attrs.barcode ?? attrs.barcode_number ?? attrs.barcodeValue ??
+      attrs.markerId ??
+      attrs.marker_id ??
+      attrs.markerIdValue ??
+      attrs.numeral ??
+      attrs.numeral_value ??
+      attrs.documentId ??
+      attrs.document_id ??
+      attrs.id ??
+      raw.id ??
+      null;
+
+    const markerId = candidateMarkerId !== undefined && candidateMarkerId !== null ? candidateMarkerId : null;
+
+    // QR code fallback: try many variants; if none, fallback to `marker-<markerId>` when markerId exists
+    const qrCodeData =
+      attrs.qrCodeData ?? attrs.qr_code_data ?? attrs.qr ?? attrs.qrcode ??
+      (markerId != null ? `marker-${markerId}` : undefined);
+
+    const objectName = attrs.objectName ?? attrs.object_name ?? attrs.name ?? attrs.title ?? 'Unnamed Object';
+    const modelUrl = attrs.modelUrl ?? attrs.model_url ?? attrs.url ?? attrs.url3D ?? attrs.url_3d ?? '';
     const active = attrs.active !== undefined ? attrs.active : true;
 
-    // Only skip if markerId is missing. If modelUrl is missing, include the
-    // item but warn so incomplete entries can be fixed in Strapi.
-    if (markerId === undefined || markerId === null) {
-      return null;
+    // If we couldn't find any reasonable identifier, still include the item
+    // by using the Strapi item id as a last-resort markerId (if available).
+    // The goal is to avoid returning an empty list when Strapi has data.
+    let finalMarkerId: any = markerId;
+    if (finalMarkerId === null || finalMarkerId === undefined) {
+      if (raw && raw.id !== undefined && raw.id !== null) {
+        // eslint-disable-next-line no-console
+        console.warn('Marker id missing; using Strapi entry id as markerId for item:', raw.id);
+        finalMarkerId = raw.id;
+      } else {
+        // no usable id at all; warn but continue by skipping numeric conversion
+        // eslint-disable-next-line no-console
+        console.warn('Strapi item missing any identifier (markerId/numeral/id). Including item with markerId=null:', JSON.stringify(raw).slice(0, 200));
+        finalMarkerId = null;
+      }
     }
 
     if (!modelUrl) {
       // eslint-disable-next-line no-console
-      console.warn('Strapi item missing modelUrl for markerId:', markerId);
+      console.warn('Strapi item missing modelUrl for markerId:', finalMarkerId);
     }
 
     return {
-      markerId: Number(markerId),
-      qrCodeData: String(qrCodeData),
+      markerId: finalMarkerId !== null ? Number(finalMarkerId) : NaN,
+      qrCodeData: qrCodeData !== undefined ? String(qrCodeData) : (finalMarkerId !== null ? `marker-${finalMarkerId}` : ''),
       objectName: String(objectName),
       modelUrl: String(modelUrl),
       active: Boolean(active),

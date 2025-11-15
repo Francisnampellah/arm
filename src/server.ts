@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import dotenv from 'dotenv';
 import { StrapiService } from './services/strapi';
@@ -24,6 +25,21 @@ const viewDir = path.join(projectRoot, 'view');
 // Serve static files from project root and view directory
 app.use(express.static(projectRoot));
 app.use(express.static(viewDir));
+// Serve markers assets from persistent volume if present, otherwise fall back to repo
+const markersVolumePath = '/data/markers';
+const markersFallback = path.join(projectRoot, 'markers');
+if (fs.existsSync(markersVolumePath)) {
+  // eslint-disable-next-line no-console
+  console.log('Serving markers from volume at', markersVolumePath);
+  app.use('/markers', express.static(markersVolumePath));
+} else if (fs.existsSync(markersFallback)) {
+  // eslint-disable-next-line no-console
+  console.log('Serving markers from repo at', markersFallback);
+  app.use('/markers', express.static(markersFallback));
+} else {
+  // eslint-disable-next-line no-console
+  console.warn('No markers directory found at', markersVolumePath, 'or', markersFallback);
+}
 app.use(express.json());
 
 // Root route serves the view/index.html

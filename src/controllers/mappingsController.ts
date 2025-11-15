@@ -10,7 +10,13 @@ export function buildGetMappingsController(strapiService: StrapiService | null) 
       }
 
       const strapiMappings = await strapiService.fetchMarkerMappings();
-      const mappings = strapiMappings.filter((m) => m.active);
+      // Only return active mappings with a valid numeric markerId
+      const mappings = strapiMappings.filter((m) => {
+        if (!m) return false;
+        if (!m.active) return false;
+        const id = Number(m.markerId);
+        return Number.isFinite(id) && !Number.isNaN(id);
+      });
 
       res.json(mappings);
     } catch (error) {
