@@ -7,24 +7,20 @@
 
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+    <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; patternRatio: 0.85; minConfidence: 0.95;" gesture-detector>
       
       <!-- Custom marker disabled until a real .patt file is provided
       -->
       <!-- Example pattern marker using the bundled patterns directory -->
-      <a-assets>
+      <!-- <a-assets>
         <a-asset-item id="hiro-model" src="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Lantern/glTF/Lantern.gltf"></a-asset-item>
-      </a-assets>
-
-      <!-- Hiro marker -->
-      <a-marker type="barcode" value="1" preset="hiro">
-        <a-entity gltf-model="#hiro-model" position="0 0 0" rotation="0 0 0" scale="0.4 0.4 0.4"></a-entity>
-      </a-marker>
-
+      </a-assets> -->
       <!-- Dynamic barcode markers will be appended here by script -->
 
-      <!-- Camera -->
-      <a-entity camera></a-entity>
+      <!-- Camera with mouse/touch cursor for click interactions -->
+      <a-entity camera>
+        <a-entity cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
+      </a-entity>
     </a-scene>
     <script>
       // Debug: log when the Hiro marker is detected or lost and wait for scene load
@@ -54,22 +50,64 @@
                 var id = Number(m.markerId);
                 if (!Number.isFinite(id) || Number.isNaN(id)) return; // skip invalid ids
 
+                // Map markerId directly to pattern file: markerId=1 -> pattern-01.patt
+                // If markerId exceeds available pattern files, you can later add more or clamp.
                 var maxPatterns = 64;
-                var index = ((id - 1) % maxPatterns + maxPatterns) % maxPatterns; // zero-based
-                var pad = String(index).padStart(2, '0');
+                var clampedId = id > 0 ? id : 1; // ensure positive
+                if (clampedId > maxPatterns) {
+                  console.warn('MarkerId', id, 'exceeds maxPatterns', maxPatterns, 'clamping to', maxPatterns);
+                  clampedId = maxPatterns;
+                }
+                var pad = String(clampedId).padStart(2, '0');
                 var patternUrl = '/markers/patterns/pattern-' + pad + '.patt';
 
                 var marker = document.createElement('a-marker');
                 marker.setAttribute('type', 'pattern');
                 marker.setAttribute('url', patternUrl);
                 marker.setAttribute('emitevents', 'true');
+                // Tighten detection to reduce false positives on similar patterns
+                marker.setAttribute('minConfidence', '0.98');
+                marker.setAttribute('patternRatio', '0.85');
+                // Smoothing to stabilize tracking
+                marker.setAttribute('smooth', 'true');
+                marker.setAttribute('smoothCount', '5');
+                marker.setAttribute('smoothTolerance', '0.01');
+                marker.setAttribute('smoothThreshold', '2');
+                marker.setAttribute('id', 'marker-' + id);
+
+                // Debug logging
+                console.log('Creating marker:', {
+                  markerId: id,
+                  patternUrl: patternUrl,
+                  objectName: m.objectName,
+                  modelUrl: m.modelUrl
+                });
+
+                // Add marker event listeners for debugging
+                marker.addEventListener('markerFound', function() {
+                  console.log('Pattern marker found:', m.objectName, 'at', patternUrl, '| 3D Object URL:', m.modelUrl);
+                });
+                marker.addEventListener('markerLost', function() {
+                  console.log('Pattern marker lost:', m.objectName, '| 3D Object URL:', m.modelUrl);
+                });
 
                 if (m.modelUrl && typeof m.modelUrl === 'string' && m.modelUrl.trim() !== '') {
                   var entity = document.createElement('a-entity');
                   entity.setAttribute('gltf-model', m.modelUrl);
                   entity.setAttribute('position', '0 0 0');
                   entity.setAttribute('rotation', '0 0 0');
-                  entity.setAttribute('scale', '0.5 0.5 0.5');
+                  entity.setAttribute('scale', '0.875 0.875 0.875');
+                  // Make interactive: enable gestures and click-to-spin
+                  entity.classList.add('clickable');
+                  entity.setAttribute('gesture-controls', 'minScale: 0.25; maxScale: 3; rotationFactor: 5');
+                  // click to toggle spin animation
+                  entity.addEventListener('click', function () {
+                    if (entity.hasAttribute('animation__spin')) {
+                      entity.removeAttribute('animation__spin');
+                    } else {
+                      entity.setAttribute('animation__spin', 'property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear');
+                    }
+                  });
                   marker.appendChild(entity);
                 } else {
                   var placeholder = document.createElement('a-box');
@@ -85,9 +123,11 @@
                   var text = document.createElement('a-text');
                   text.setAttribute('value', m.objectName);
                   text.setAttribute('align', 'center');
-                  text.setAttribute('position', '0 1 0');
+                  text.setAttribute('position', '1.2 0.5 0');
+                  text.setAttribute('rotation', '0 -90 0');
                   text.setAttribute('color', '#FFF');
-                  text.setAttribute('wrap-count', '20');
+                  text.setAttribute('scale', '1.5 1.5 1.5');
+                  text.setAttribute('wrap-count', '15');
                   marker.appendChild(text);
                 }
 
