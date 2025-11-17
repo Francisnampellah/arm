@@ -33,6 +33,29 @@ services:
       timeout: 5s
       retries: 10
 
+  traefik:
+    image: traefik:v2.10
+    container_name: arm-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # dashboard (insecure)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/etc/traefik
+    command: >
+      sh -c "touch /etc/traefik/acme.json || true; chmod 600 /etc/traefik/acme.json || true; \
+      traefik --api.insecure=false --providers.docker=true --providers.docker.exposedbydefault=false \
+      --providers.file.filename=/etc/traefik/dynamic.yml --providers.file.watch=true \
+      --entrypoints.web.address=":80" --entrypoints.websecure.address=":443" \
+      --certificatesresolvers.le.acme.email=admin@bluetech.software \
+      --certificatesresolvers.le.acme.storage=/etc/traefik/acme.json \
+      --certificatesresolvers.le.acme.tlschallenge=true"
+    networks:
+      - proxy
+    # Traefik dashboard/router is provided by the file provider (see traefik/dynamic.yml)
+
   strapi:
     image: node:20-alpine
     container_name: arm-strapi
@@ -74,15 +97,26 @@ services:
               mkdir -p config &&
               printf 'module.exports = ({ env }) => ({ connection: { client: \"postgres\", connection: { host: env(\"DATABASE_HOST\", \"strapi-db\"), port: env.int(\"DATABASE_PORT\", 5432), database: env(\"DATABASE_NAME\", \"strapi\"), user: env(\"DATABASE_USERNAME\", \"strapi\"), password: env(\"DATABASE_PASSWORD\", \"strapi_pass\"), ssl: env.bool(\"DATABASE_SSL\", false) } } });\n' > config/database.js &&
               npm run develop"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.strapi.rule=Host(`strapi.bluetech.software`)"
+      - "traefik.http.routers.strapi.entrypoints=web"
+      - "traefik.http.services.strapi.loadbalancer.server.port=1337"
+      - "traefik.http.routers.strapi.middlewares=strapi-https-redirect@docker"
+      - "traefik.http.routers.strapi-secure.rule=Host(`strapi.bluetech.software`)"
+      - "traefik.http.routers.strapi-secure.entrypoints=websecure"
+      - "traefik.http.routers.strapi-secure.tls=true"
+      - "traefik.http.routers.strapi-secure.tls.certresolver=le"
+      - "traefik.http.middlewares.strapi-https-redirect.redirectscheme.scheme=https"
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: arm-app
-    depends_on:
-      strapi:
-        condition: service_healthy
+    # depends_on already defined earlier; keep original dependency block above
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -94,9 +128,30 @@ services:
       - "3001:3000"
     volumes:
       - app_data:/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`arm.bluetech.software`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - "traefik.http.routers.app.middlewares=app-https-redirect@docker"
+      - "traefik.http.routers.app-secure.rule=Host(`arm.bluetech.software`)"
+      - "traefik.http.routers.app-secure.entrypoints=websecure"
+      - "traefik.http.routers.app-secure.tls=true"
+      - "traefik.http.routers.app-secure.tls.certresolver=le"
+      - "traefik.http.middlewares.app-https-redirect.redirectscheme.scheme=https"
+    depends_on:
+      strapi:
+        condition: service_healthy
 
 volumes:
   postgres_data:
   strapi_db_data:
   strapi_app_data:
   app_data:
+  # traefik_data removed in favor of bind mount to ./traefik
+
+networks:
+  proxy:
+    driver: bridge

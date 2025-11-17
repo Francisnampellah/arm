@@ -1,0 +1,15 @@
+http:
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        # Traefik will read basic auth users from this file. Generate with htpasswd / openssl.
+        usersFile: /etc/traefik/htpasswd
+
+  routers:
+    traefik-dashboard:
+      rule: Host(`traefik.arm.bluetech.software`)
+      entryPoints:
+        - websecure
+      service: api@internal
+      tls:
+        certResolver: le
