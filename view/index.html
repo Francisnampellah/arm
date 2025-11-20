@@ -53,11 +53,11 @@
                 // Map markerId directly to pattern file: markerId=1 -> pattern-01.patt
                 // If markerId exceeds available pattern files, you can later add more or clamp.
                 var maxPatterns = 64;
-                var clampedId = id > 0 ? id : 1; // ensure positive
-                if (clampedId > maxPatterns) {
-                  console.warn('MarkerId', id, 'exceeds maxPatterns', maxPatterns, 'clamping to', maxPatterns);
-                  clampedId = maxPatterns;
-                }
+                var clampedId = (id >= 0 && id <= maxPatterns) ? id : (id < 0 ? 0 : maxPatterns);
+                // if (clampedId > maxPatterns) {
+                //   console.warn('MarkerId', id, 'exceeds maxPatterns', maxPatterns, 'clamping to', maxPatterns);
+                //   clampedId = maxPatterns;
+                // }
                 var pad = String(clampedId).padStart(2, '0');
                 var patternUrl = '/markers/patterns/pattern-' + pad + '.patt';
 
