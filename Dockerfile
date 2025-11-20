@@ -16,9 +16,17 @@ RUN npm install
 # Copy the rest of the app code
 COPY . .
 
+# Build Typescript
+RUN npm run build 
+
 # Install entrypoint script
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+
+# Run this if you're using linux
+#RUN chmod +x /docker-entrypoint.sh 
+
+# Uncomment this if you're using a windows machine, and comment the linux script
+RUN sed -i 's/\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
 
 # Expose the app port
 EXPOSE 3000
