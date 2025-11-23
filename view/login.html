@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AR Marker System</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <h1 data-i18n="welcomeBack">Welcome Back</h1>
+        <p class="subtitle" data-i18n="loginSubtitle">Login to your account</p>
+        
+        <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="identifier" data-i18n="emailOrUsername">Email or Username</label>
+                <input type="text" id="identifier" name="identifier" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password" data-i18n="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                    <button type="button" class="password-toggle" id="passwordToggle" tabindex="-1">
+                        <span id="toggleIcon">👁️</span>
+                    </button>
+                </div>
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink" data-i18n="forgotPassword">Forgot password?</a>
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" data-i18n="login">Login</button>
+        </form>
+        
+        <div class="register-link">
+            <span data-i18n="noAccount">Don't have an account?</span> 
+            <a href="/register" data-i18n="registerHere">Register here</a>
+        </div>
+    </div>
+
+    <div style="position: fixed; top: 20px; right: 20px;">
+        <select id="languageSwitcher" style="padding: 8px; border-radius: 5px;">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+        </select>
+    </div>
+
+    <script type="module" src="/js/login.js"></script>
+</body>
+</html>

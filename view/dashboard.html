@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AR Marker System</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="header">
+        <h1>AR Marker Dashboard</h1>
+        <div class="user-info">
+            <select id="languageSwitcher" class="language-switcher">
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+            </select>
+            <span id="userName">Loading...</span>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="create">Create Marker</button>
+            <button class="tab" data-tab="upload">Upload CSV</button>
+            <button class="tab" data-tab="markers">My Markers</button>
+        </div>
+
+        <!-- Create Marker Tab -->
+        <div id="createTab" class="tab-content active">
+            <div class="card">
+                <h2>Create New Marker</h2>
+                <div id="createError" class="error"></div>
+                <div id="createSuccess" class="success"></div>
+                <form id="createMarkerForm">
+                    <div class="form-group">
+                        <label for="markerName">Name *</label>
+                        <input type="text" id="markerName" name="markerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="markerUrl3D">3D Model URL *</label>
+                        <input type="url" id="markerUrl3D" name="markerUrl3D" required placeholder="https://example.com/model.gltf">
+                    </div>
+                    <div class="form-group">
+                        <label for="markerBarcode">Barcode (Pattern Number)</label>
+                        <input type="number" id="markerBarcode" name="markerBarcode" min="0" max="63" placeholder="0-63">
+                    </div>
+                    <button type="submit" id="createBtn">Create Marker</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Upload CSV Tab -->
+        <div id="uploadTab" class="tab-content">
+            <div class="card">
+                <h2>Bulk Upload Markers</h2>
+                <div id="uploadError" class="error"></div>
+                <div id="uploadSuccess" class="success"></div>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="file-upload-icon">📄</div>
+                    <div class="file-upload-text">Click to upload or drag and drop</div>
+                    <div class="file-upload-hint">CSV file (name, url3D, barcode)</div>
+                    <input type="file" id="csvFile" accept=".csv" />
+                </div>
+                <div id="csvResult" class="csv-result" style="display: none;"></div>
+                <button id="uploadBtn" style="display: none; margin-top: 20px;" disabled>Upload CSV</button>
+            </div>
+        </div>
+
+        <!-- My Markers Tab -->
+        <div id="markersTab" class="tab-content">
+            <div class="card">
+                <h2>My Markers</h2>
+                <div id="markersLoading" class="loading">Loading markers...</div>
+                <div id="markersList" class="markers-list" style="display: none;"></div>
+                <div id="markersEmpty" class="empty-state" style="display: none;">
+                    No markers found. Create your first marker!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Marker</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="editError" class="error"></div>
+                <div id="editSuccess" class="success"></div>
+                <form id="editMarkerForm">
+                    <input type="hidden" id="editMarkerId" />
+                    <div class="form-group">
+                        <label for="editMarkerName">Name *</label>
+                        <input type="text" id="editMarkerName" name="editMarkerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMarkerUrl3D">3D Model URL *</label>
+                        <input type="url" id="editMarkerUrl3D" name="editMarkerUrl3D" required placeholder="https://example.com/model.gltf">
+                    </div>
+                    <div class="form-group">
+                        <label for="editMarkerBarcode">Barcode (Pattern Number)</label>
+                        <input type="number" id="editMarkerBarcode" name="editMarkerBarcode" min="0" max="63" placeholder="0-63">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelEdit">Cancel</button>
+                        <button type="submit" id="updateBtn">Update Marker</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AR Marker System</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <h1 data-i18n="createAccount">Create Account</h1>
+        <p class="subtitle" data-i18n="registerSubtitle">Register as a content creator</p>
+        
+        <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username" data-i18n="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" data-i18n="email">Email</label>
+                <div class="input-wrapper">
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div id="emailValidation" class="validation-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" data-i18n="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" class="password-toggle" id="passwordToggle" tabindex="-1">
+                        <span id="toggleIcon">👁️</span>
+                    </button>
+                </div>
+                <div id="passwordValidation" class="validation-message"></div>
+                <div class="password-requirements" id="passwordRequirements">
+                    <strong data-i18n="passwordRequirements">Password must contain:</strong>
+                    <ul>
+                        <li id="req-length" data-i18n="passwordLength">At least 8 characters</li>
+                        <li id="req-uppercase" data-i18n="passwordUppercase">One uppercase letter</li>
+                        <li id="req-lowercase" data-i18n="passwordLowercase">One lowercase letter</li>
+                        <li id="req-number" data-i18n="passwordNumber">One number</li>
+                        <li id="req-special" data-i18n="passwordSpecial">One special character (!@#$%^&*)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" data-i18n="register">Register</button>
+        </form>
+        
+        <div class="login-link">
+            <span data-i18n="alreadyHaveAccount">Already have an account?</span>
+            <a href="/login" data-i18n="loginHere">Login here</a>
+        </div>
+    </div>
+
+    <div style="position: fixed; top: 20px; right: 20px;">
+        <select id="languageSwitcher" style="padding: 8px; border-radius: 5px;">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+        </select>
+    </div>
+
+    <script type="module" src="/js/register.js"></script>
+</body>
+</html>

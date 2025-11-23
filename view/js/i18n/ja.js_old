@@ -1,0 +1,101 @@
+export const ja = {
+    // Common
+    loading: '読み込み中...',
+    error: 'エラー',
+    success: '成功',
+    cancel: 'キャンセル',
+    save: '保存',
+    delete: '削除',
+    edit: '編集',
+    
+    // Auth
+    register: '登録',
+    login: 'ログイン',
+    logout: 'ログアウト',
+    username: 'ユーザー名',
+    email: 'メールアドレス',
+    password: 'パスワード',
+    confirmPassword: 'パスワード確認',
+    
+    // Register
+    createAccount: '[TRANSLATE: Create Account]',
+    registerSubtitle: '[TRANSLATE: Register as a content creator]',
+    alreadyHaveAccount: '[TRANSLATE: Already have an account?]',
+    loginHere: '[TRANSLATE: Login here]',
+    
+    // Validation
+    emailRequired: '[TRANSLATE: Please enter a valid email address]',
+    passwordTooWeak: '[TRANSLATE: Password does not meet all requirements]',
+    passwordRequirements: '[TRANSLATE: Password must contain:]',
+    passwordLength: '[TRANSLATE: At least 8 characters]',
+    passwordUppercase: '[TRANSLATE: One uppercase letter]',
+    passwordLowercase: '[TRANSLATE: One lowercase letter]',
+    passwordNumber: '[TRANSLATE: One number]',
+    passwordSpecial: '[TRANSLATE: One special character (!@#$%^&*)]',
+    
+    // Dashboard
+    dashboard: '[TRANSLATE: AR Marker Dashboard]',
+    createMarker: '[TRANSLATE: Create Marker]',
+    uploadCSV: '[TRANSLATE: Upload CSV]',
+    myMarkers: '[TRANSLATE: My Markers]',
+    createNewMarker: '[TRANSLATE: Create New Marker]',
+    name: '[TRANSLATE: Name]',
+    modelUrl: '[TRANSLATE: 3D Model URL]',
+    barcode: '[TRANSLATE: Barcode (Pattern Number)]',
+    editMarker: '[TRANSLATE: Edit Marker]',
+    updateMarker: '[TRANSLATE: Update Marker]',
+    deleteConfirm: '[TRANSLATE: Are you sure you want to delete this marker?]',
+    noMarkers: '[TRANSLATE: No markers found. Create your first marker!]',
+    
+    // Messages
+    markerCreated: '[TRANSLATE: Marker created successfully!]',
+    markerUpdated: '[TRANSLATE: Marker updated successfully!]',
+    markerDeleted: '[TRANSLATE: Marker deleted successfully!]',
+    uploadSuccess: '[TRANSLATE: Successfully uploaded {count} marker(s)!]',
+    
+    // Additional keys
+    nameAndUrlRequired: '[TRANSLATE: Name and 3D Model URL are required]',
+    creating: '[TRANSLATE: Creating...]',
+    failedToCreateMarker: '[TRANSLATE: Failed to create marker]',
+    errorOccurred: '[TRANSLATE: An error occurred]',
+    uploading: '[TRANSLATE: Uploading...]',
+    uploadFailed: '[TRANSLATE: Upload failed]',
+    uploadResults: '[TRANSLATE: Upload Results]',
+    total: '[TRANSLATE: Total]',
+    successful: '[TRANSLATE: Successful]',
+    failed: '[TRANSLATE: Failed]',
+    row: '[TRANSLATE: Row]',
+    markerId: '[TRANSLATE: Marker ID]',
+    updating: '[TRANSLATE: Updating...]',
+    failedToUpdateMarker: '[TRANSLATE: Failed to update marker]',
+    unnamed: '[TRANSLATE: Unnamed]',
+    errorLoadingMarkers: '[TRANSLATE: Error loading markers]',
+    failedToDelete: '[TRANSLATE: Failed to delete marker]',
+    errorDeletingMarker: '[TRANSLATE: Error deleting marker]',
+    dragDropCSV: '[TRANSLATE: Click to upload or drag and drop]',
+    csvFileHint: '[TRANSLATE: CSV file (name, url3D, barcode)]',
+
+     // Register page
+     validEmailFormat: '[TRANSLATE: ✓ Valid email format]',
+     invalidEmailFormat: '[TRANSLATE: ✗ Please enter a valid email address]',
+     strongPassword: '[TRANSLATE: ✓ Strong password]',
+     registering: '[TRANSLATE: Registering...]',
+     registrationFailed: '[TRANSLATE: Registration failed]',
+     registrationSuccess: '[TRANSLATE: Registration successful! Redirecting to login...]',
+     registrationError: '[TRANSLATE: An error occurred during registration]',
+     
+     // Login page
+     welcomeBack: '[TRANSLATE: Welcome Back]',
+     loginSubtitle: '[TRANSLATE: Login to your account]',
+     emailOrUsername: '[TRANSLATE: Email or Username]',
+     forgotPassword: '[TRANSLATE: Forgot password?]',
+     forgotPasswordSoon: '[TRANSLATE: Password reset functionality coming soon!]',
+     fillAllFields: '[TRANSLATE: Please fill in all fields]',
+     loggingIn: '[TRANSLATE: Logging in...]',
+     loginFailed: '[TRANSLATE: Login failed]',
+     loginSuccess: '[TRANSLATE: Login successful! Redirecting...]',
+     invalidServerResponse: '[TRANSLATE: Invalid response from server]',
+     loginError: '[TRANSLATE: An error occurred during login]',
+     noAccount: "[TRANSLATE: Don't have an account?]",
+     registerHere: '[TRANSLATE: Register here]',
+};
