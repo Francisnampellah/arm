@@ -1,0 +1,184 @@
+/* Auth Pages Layout */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitle {
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    padding: 12px 45px 12px 12px;
+}
+
+input.invalid {
+    border-color: #e74c3c;
+}
+
+input.valid {
+    border-color: #27ae60;
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    z-index: 1;
+}
+
+.password-toggle:hover {
+    color: #333;
+    transform: translateY(-50%);
+}
+
+/* Submit Button */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Validation Messages */
+.validation-message {
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+}
+
+.validation-message.show {
+    display: block;
+}
+
+.validation-message.error {
+    color: #e74c3c;
+}
+
+.validation-message.success {
+    color: #27ae60;
+}
+
+/* Password Requirements (Register specific) */
+.password-requirements {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #666;
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, margin-top 0.3s ease-out;
+}
+
+.password-requirements.show {
+    display: block;
+    max-height: 200px;
+    margin-top: 5px;
+}
+
+.password-requirements ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.password-requirements li {
+    margin: 3px 0;
+    display: flex;
+    align-items: center;
+}
+
+.password-requirements li::before {
+    content: '○';
+    margin-right: 8px;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.password-requirements li.valid::before {
+    content: '✓';
+    color: #27ae60;
+}
+
+/* Forgot Password (Login specific) */
+.forgot-password {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* Auth Links */
+.login-link,
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.login-link a,
+.register-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover,
+.register-link a:hover {
+    text-decoration: underline;
+}

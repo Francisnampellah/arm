@@ -4,214 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - AR Marker System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .subtitle {
-            color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-        }
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        input {
-            width: 100%;
-            padding: 12px 45px 12px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        input.invalid {
-            border-color: #e74c3c;
-        }
-        input.valid {
-            border-color: #27ae60;
-        }
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            font-size: 18px;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            z-index: 1;
-        }
-        .password-toggle:hover {
-            color: #333;
-        }
-        .validation-message {
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-        .validation-message.show {
-            display: block;
-        }
-        .validation-message.error {
-            color: #e74c3c;
-        }
-        .validation-message.success {
-            color: #27ae60;
-        }
-        .password-requirements {
-            font-size: 12px;
-            margin-top: 5px;
-            color: #666;
-            display: none;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, margin-top 0.3s ease-out;
-        }
-        .password-requirements.show {
-            display: block;
-            max-height: 200px;
-            margin-top: 5px;
-        }
-        .password-requirements ul {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 5px;
-        }
-        .password-requirements li {
-            margin: 3px 0;
-            display: flex;
-            align-items: center;
-        }
-        .password-requirements li::before {
-            content: '○';
-            margin-right: 8px;
-            color: #ccc;
-            font-size: 14px;
-        }
-        .password-requirements li.valid::before {
-            content: '✓';
-            color: #27ae60;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error.show {
-            display: block;
-        }
-        .success {
-            background: #efe;
-            color: #3c3;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .success.show {
-            display: block;
-        }
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <div class="container">
-        <h1>Create Account</h1>
-        <p class="subtitle">Register as a content creator</p>
+        <h1 data-i18n="createAccount">Create Account</h1>
+        <p class="subtitle" data-i18n="registerSubtitle">Register as a content creator</p>
         
         <div id="error" class="error"></div>
         <div id="success" class="success"></div>
         
         <form id="registerForm">
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username" data-i18n="username">Username</label>
                 <input type="text" id="username" name="username" required>
             </div>
             
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email" data-i18n="email">Email</label>
                 <div class="input-wrapper">
                     <input type="email" id="email" name="email" required>
                 </div>
@@ -219,7 +30,7 @@
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password" data-i18n="password">Password</label>
                 <div class="input-wrapper">
                     <input type="password" id="password" name="password" required>
                     <button type="button" class="password-toggle" id="passwordToggle" tabindex="-1">
@@ -228,212 +39,33 @@
                 </div>
                 <div id="passwordValidation" class="validation-message"></div>
                 <div class="password-requirements" id="passwordRequirements">
-                    <strong>Password must contain:</strong>
+                    <strong data-i18n="passwordRequirements">Password must contain:</strong>
                     <ul>
-                        <li id="req-length">At least 8 characters</li>
-                        <li id="req-uppercase">One uppercase letter</li>
-                        <li id="req-lowercase">One lowercase letter</li>
-                        <li id="req-number">One number</li>
-                        <li id="req-special">One special character (!@#$%^&*)</li>
+                        <li id="req-length" data-i18n="passwordLength">At least 8 characters</li>
+                        <li id="req-uppercase" data-i18n="passwordUppercase">One uppercase letter</li>
+                        <li id="req-lowercase" data-i18n="passwordLowercase">One lowercase letter</li>
+                        <li id="req-number" data-i18n="passwordNumber">One number</li>
+                        <li id="req-special" data-i18n="passwordSpecial">One special character (!@#$%^&*)</li>
                     </ul>
                 </div>
             </div>
             
-            <button type="submit" id="submitBtn">Register</button>
+            <button type="submit" id="submitBtn" data-i18n="register">Register</button>
         </form>
         
         <div class="login-link">
-            Already have an account? <a href="/login">Login here</a>
+            <span data-i18n="alreadyHaveAccount">Already have an account?</span>
+            <a href="/login" data-i18n="loginHere">Login here</a>
         </div>
     </div>
 
-    <script>
-        const STRAPI_URL = 'http://localhost:1337';
-        
-        // Password toggle functionality
-        const passwordInput = document.getElementById('password');
-        const passwordToggle = document.getElementById('passwordToggle');
-        const toggleIcon = document.getElementById('toggleIcon');
-        const passwordRequirements = document.getElementById('passwordRequirements');
-        
-        passwordToggle.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            toggleIcon.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-        
-        // Show password requirements on focus
-        passwordInput.addEventListener('focus', () => {
-            passwordRequirements.classList.add('show');
-        });
-        
-        // Hide password requirements on blur (if password is empty or invalid)
-        passwordInput.addEventListener('blur', () => {
-            const password = passwordInput.value;
-            // Keep showing if password has content and is being validated
-            if (password === '') {
-                passwordRequirements.classList.remove('show');
-            }
-        });
-        
-        // Email validation
-        const emailInput = document.getElementById('email');
-        const emailValidation = document.getElementById('emailValidation');
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        emailInput.addEventListener('input', () => {
-            const email = emailInput.value.trim();
-            if (email === '') {
-                emailInput.classList.remove('valid', 'invalid');
-                emailValidation.classList.remove('show');
-                return;
-            }
-            
-            if (emailRegex.test(email)) {
-                emailInput.classList.remove('invalid');
-                emailInput.classList.add('valid');
-                emailValidation.textContent = '✓ Valid email format';
-                emailValidation.classList.remove('error');
-                emailValidation.classList.add('success', 'show');
-            } else {
-                emailInput.classList.remove('valid');
-                emailInput.classList.add('invalid');
-                emailValidation.textContent = '✗ Please enter a valid email address';
-                emailValidation.classList.remove('success');
-                emailValidation.classList.add('error', 'show');
-            }
-        });
-        
-        // Password strength validation
-        const passwordValidation = document.getElementById('passwordValidation');
-        
-        const requirements = {
-            length: { element: document.getElementById('req-length'), test: (pwd) => pwd.length >= 8 },
-            uppercase: { element: document.getElementById('req-uppercase'), test: (pwd) => /[A-Z]/.test(pwd) },
-            lowercase: { element: document.getElementById('req-lowercase'), test: (pwd) => /[a-z]/.test(pwd) },
-            number: { element: document.getElementById('req-number'), test: (pwd) => /[0-9]/.test(pwd) },
-            special: { element: document.getElementById('req-special'), test: (pwd) => /[!@#$%^&*]/.test(pwd) },
-        };
-        
-        passwordInput.addEventListener('input', () => {
-            const password = passwordInput.value;
-            
-            // Show requirements if hidden and user is typing
-            if (password.length > 0 && !passwordRequirements.classList.contains('show')) {
-                passwordRequirements.classList.add('show');
-            }
-            
-            // Check each requirement
-            let allValid = true;
-            for (const [key, req] of Object.entries(requirements)) {
-                if (req.test(password)) {
-                    req.element.classList.add('valid');
-                } else {
-                    req.element.classList.remove('valid');
-                    allValid = false;
-                }
-            }
-            
-            // Update input styling and validation message
-            if (password === '') {
-                passwordInput.classList.remove('valid', 'invalid');
-                passwordValidation.classList.remove('show');
-            } else if (allValid) {
-                passwordInput.classList.remove('invalid');
-                passwordInput.classList.add('valid');
-                passwordValidation.textContent = '✓ Strong password';
-                passwordValidation.classList.remove('error');
-                passwordValidation.classList.add('success', 'show');
-            } else {
-                passwordInput.classList.remove('valid');
-                passwordInput.classList.add('invalid');
-                passwordValidation.textContent = '✗ Password does not meet all requirements';
-                passwordValidation.classList.remove('success');
-                passwordValidation.classList.add('error', 'show');
-            }
-        });
-        
-        // Form submission
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const errorDiv = document.getElementById('error');
-            const successDiv = document.getElementById('success');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            // Hide previous messages
-            errorDiv.classList.remove('show');
-            successDiv.classList.remove('show');
-            
-            // Get form data
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
-            // Validate email format
-            if (!emailRegex.test(email)) {
-                errorDiv.textContent = 'Please enter a valid email address';
-                errorDiv.classList.add('show');
-                emailInput.focus();
-                return;
-            }
-            
-            // Validate password strength
-            let passwordValid = true;
-            for (const req of Object.values(requirements)) {
-                if (!req.test(password)) {
-                    passwordValid = false;
-                    break;
-                }
-            }
-            
-            if (!passwordValid) {
-                errorDiv.textContent = 'Password does not meet all requirements';
-                errorDiv.classList.add('show');
-                passwordInput.focus();
-                return;
-            }
-            
-            // Disable button
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Registering...';
-            
-            try {
-                const response = await fetch(`${STRAPI_URL}/api/auth/local/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username,
-                        email,
-                        password,
-                    }),
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.error?.message || data.message || 'Registration failed');
-                }
-                
-                // Success
-                successDiv.textContent = 'Registration successful! Redirecting to login...';
-                successDiv.classList.add('show');
-                
-                // Redirect to login after 2 seconds
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 2000);
-                
-            } catch (error) {
-                errorDiv.textContent = error.message || 'An error occurred during registration';
-                errorDiv.classList.add('show');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Register';
-            }
-        });
-    </script>
+    <div style="position: fixed; top: 20px; right: 20px;">
+        <select id="languageSwitcher" style="padding: 8px; border-radius: 5px;">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+        </select>
+    </div>
+
+    <script type="module" src="/js/register.js"></script>
 </body>
 </html>

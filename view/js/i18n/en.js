@@ -1,0 +1,101 @@
+export const en = {
+    // Common
+    loading: 'Loading...',
+    error: 'Error',
+    success: 'Success',
+    cancel: 'Cancel',
+    save: 'Save',
+    delete: 'Delete',
+    edit: 'Edit',
+    
+    // Auth
+    register: 'Register',
+    login: 'Login',
+    logout: 'Logout',
+    username: 'Username',
+    email: 'Email',
+    password: 'Password',
+    confirmPassword: 'Confirm Password',
+    
+    // Register
+    createAccount: 'Create Account',
+    registerSubtitle: 'Register as a content creator',
+    alreadyHaveAccount: 'Already have an account?',
+    loginHere: 'Login here',
+    
+    // Validation
+    emailRequired: 'Please enter a valid email address',
+    passwordTooWeak: 'Password does not meet all requirements',
+    passwordRequirements: 'Password must contain:',
+    passwordLength: 'At least 8 characters',
+    passwordUppercase: 'One uppercase letter',
+    passwordLowercase: 'One lowercase letter',
+    passwordNumber: 'One number',
+    passwordSpecial: 'One special character (!@#$%^&*)',
+    
+    // Dashboard
+    dashboard: 'AR Marker Dashboard',
+    createMarker: 'Create Marker',
+    uploadCSV: 'Upload CSV',
+    myMarkers: 'My Markers',
+    createNewMarker: 'Create New Marker',
+    name: 'Name',
+    modelUrl: '3D Model URL',
+    barcode: 'Barcode (Pattern Number)',
+    editMarker: 'Edit Marker',
+    updateMarker: 'Update Marker',
+    deleteConfirm: 'Are you sure you want to delete this marker?',
+    noMarkers: 'No markers found. Create your first marker!',
+    
+    // Messages
+    markerCreated: 'Marker created successfully!',
+    markerUpdated: 'Marker updated successfully!',
+    markerDeleted: 'Marker deleted successfully!',
+    uploadSuccess: 'Successfully uploaded {count} marker(s)!',
+    
+    // Additional keys used in dashboard
+    nameAndUrlRequired: 'Name and 3D Model URL are required',
+    creating: 'Creating...',
+    failedToCreateMarker: 'Failed to create marker',
+    errorOccurred: 'An error occurred',
+    uploading: 'Uploading...',
+    uploadFailed: 'Upload failed',
+    uploadResults: 'Upload Results',
+    total: 'Total',
+    successful: 'Successful',
+    failed: 'Failed',
+    row: 'Row',
+    markerId: 'Marker ID',
+    updating: 'Updating...',
+    failedToUpdateMarker: 'Failed to update marker',
+    unnamed: 'Unnamed',
+    errorLoadingMarkers: 'Error loading markers',
+    failedToDelete: 'Failed to delete marker',
+    errorDeletingMarker: 'Error deleting marker',
+    dragDropCSV: 'Click to upload or drag and drop',
+    csvFileHint: 'CSV file (name, url3D, barcode)',
+
+     // Register page
+     validEmailFormat: '✓ Valid email format',
+     invalidEmailFormat: '✗ Please enter a valid email address',
+     strongPassword: '✓ Strong password',
+     registering: 'Registering...',
+     registrationFailed: 'Registration failed',
+     registrationSuccess: 'Registration successful! Redirecting to login...',
+     registrationError: 'An error occurred during registration',
+     
+     // Login page
+     welcomeBack: 'Welcome Back',
+     loginSubtitle: 'Login to your account',
+     emailOrUsername: 'Email or Username',
+     forgotPassword: 'Forgot password?',
+     forgotPasswordSoon: 'Password reset functionality coming soon!',
+     fillAllFields: 'Please fill in all fields',
+     loggingIn: 'Logging in...',
+     loginFailed: 'Login failed',
+     loginSuccess: 'Login successful! Redirecting...',
+     invalidServerResponse: 'Invalid response from server',
+     loginError: 'An error occurred during login',
+     noAccount: "Don't have an account?",
+     registerHere: 'Register here',
+};

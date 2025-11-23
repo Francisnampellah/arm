@@ -149,7 +149,7 @@ export function buildBulkUploadController(strapiService: StrapiService | null) {
 
           // Add owner if user token was provided and we got the user ID
           if (userId !== undefined) {
-            strapiData.owner = {id: userId};
+            strapiData.userId = userId;
           }
 
           // Add barcode if provided (this becomes markerId in the mapping)
